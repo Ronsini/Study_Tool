@@ -74,6 +74,7 @@
 
 ### focus_predictions
 ```json
+
 {
   "user_id": "string",
   "session_id": "string",
@@ -90,3 +91,11 @@
   }
 }
 ```
+
+---
+
+## Related
+- [[stack]] — the databases and ORMs used to implement this schema
+- [[api-routes]] — endpoints that read and write this data
+- [[features]] — features that drive these schema decisions
+- [[decision-log]] — decisions behind PostgreSQL vs MongoDB split

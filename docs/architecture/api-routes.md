@@ -59,3 +59,10 @@ Base URL: `http://localhost:8000` (local) / `https://api.studytool.app` (prod)
 | GET | /insights/weekly | This week's summary |
 | GET | /insights/subjects | Per-subject performance stats |
 | GET | /insights/streaks | Current and longest streak data |
+
+---
+
+## Related
+- [[database-schema]] — data models these routes read and write
+- [[stack]] — FastAPI framework these routes are built on
+- [[features]] — product features these routes serve

@@ -30,3 +30,9 @@ Over time       → personal study intelligence
 
 ## The Single Promise
 "The time you spend studying with this app is real study time. Not fake study time."
+
+---
+
+## Related
+- [[features]] — full feature breakdown, study modes, distraction thresholds
+- [[decision-log]] — key product and architecture decisions

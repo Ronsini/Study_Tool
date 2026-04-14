@@ -1,5 +1,12 @@
 # Next Steps
 
+## Related
+- [[vision]] — why we're building this
+- [[features]] — what we're building
+- [[session-001]] — most recent build log
+
+---
+
 ## Current Phase: 1 — Backend Foundation
 
 ### Immediate (next session)

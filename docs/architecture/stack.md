@@ -56,3 +56,11 @@
 | Dashboard | Vercel |
 | CI/CD | GitHub Actions |
 | Local Dev | Docker Compose |
+
+---
+
+## Related
+- [[database-schema]] — what gets stored and where
+- [[api-routes]] — endpoints built on this stack
+- [[decision-log]] — decisions behind stack choices
+- [[features]] — features this stack powers

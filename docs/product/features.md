@@ -53,3 +53,12 @@
 | Free | $0 | 2 sessions/day, 7-day history, 2 subjects |
 | Pro | $8/mo or $60/yr | Unlimited everything + AI check-ins + insights |
 | University | $5/student/mo | Everything Pro + admin dashboard + LMS integration |
+
+---
+
+## Related
+- [[vision]] — core product promise and design philosophy
+- [[stack]] — tech stack that powers these features
+- [[database-schema]] — how feature data is stored
+- [[api-routes]] — endpoints that serve feature data
+- [[decision-log]] — decisions that shaped these features

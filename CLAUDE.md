@@ -239,3 +239,56 @@ Phase: X — Name
 - Never end a session without updating `next-steps.md`
 - Never start a session without reading the most recent build log
 - If something in the docs contradicts the actual code, trust the code and update the docs
+
+---
+
+## Obsidian Backlinks — Required Linking Rules
+
+Obsidian's power comes entirely from its link graph. A file with no links is an island — it will never appear in backlinks, graph view, or search connections. **Every file written to `docs/` must use `[[wikilinks]]` to connect to related files.**
+
+### How Obsidian Links Work
+Use double brackets to link between files:
+```
+[[filename]]              → links to filename.md in the vault
+[[filename|display text]] → links with custom display text
+```
+Obsidian resolves links by filename only — no path needed unless two files share the same name.
+
+### The Link Map — What Links to What
+
+Every file must contain these links at minimum:
+
+**docs/product/vision.md**
+- Links to: `[[features]]`, `[[decision-log]]`
+
+**docs/product/features.md**
+- Links to: `[[vision]]`, `[[stack]]`, `[[database-schema]]`, `[[api-routes]]`, `[[decision-log]]`
+
+**docs/architecture/stack.md**
+- Links to: `[[database-schema]]`, `[[api-routes]]`, `[[decision-log]]`
+
+**docs/architecture/database-schema.md**
+- Links to: `[[stack]]`, `[[api-routes]]`, `[[features]]`
+
+**docs/architecture/api-routes.md**
+- Links to: `[[database-schema]]`, `[[stack]]`, `[[features]]`
+
+**docs/decisions/decision-log.md**
+- Links to: `[[stack]]`, `[[features]]`, `[[vision]]`, `[[next-steps]]`
+- Each decision entry links to the specific file it affects
+
+**docs/build-log/session-00X.md**
+- Links to: `[[next-steps]]`, `[[decision-log]]`
+- Links to any architecture file touched that session (e.g. `[[stack]]`, `[[database-schema]]`)
+
+**docs/next-steps.md**
+- Links to: `[[vision]]`, `[[features]]`
+- Links to the most recent build log (e.g. `[[session-002]]`)
+
+### Rules for Linking
+- Every new doc file must link to at least 2 other vault files
+- Every build log must link to `[[next-steps]]` and `[[decision-log]]`
+- When a decision affects a specific architecture file, add a link in that decision entry
+- When updating an architecture file, check if any build logs or decisions reference it and add backlinks
+- Never create a new `docs/` file without adding its link to at least one existing file
+- After writing a new file, go back and add `[[new-filename]]` into the files that relate to it

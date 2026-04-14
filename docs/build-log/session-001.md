@@ -25,3 +25,10 @@ Begin Phase 1 backend:
 - Environment config + .env.example
 - Database connections (PostgreSQL via SQLModel, MongoDB via Beanie, Redis)
 - Auth system (register, login, JWT, refresh, Google OAuth)
+
+---
+
+## Related
+- [[next-steps]] — full checklist of what remains
+- [[decision-log]] — decisions made this session
+- [[stack]] — tech stack set up this session
