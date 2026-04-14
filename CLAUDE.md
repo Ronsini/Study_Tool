@@ -234,8 +234,30 @@ Phase: X — Name
 - Group by phase
 - Always reflect current reality — if something was descoped, remove it
 
-### Rules
+### Live Update Rules — Non-Negotiable
+These apply continuously throughout a session, not just at the start and end.
+
+**During the session — update immediately when:**
+- A new file is created → add it to the current session's build log under "Files Created / Modified"
+- A bug is hit and fixed → add it to "Issues Encountered" in the current session log
+- An architectural decision is made (schema change, library swap, pattern choice) → log it in `decision-log.md` before moving on
+- A route, schema, or stack detail changes → update the relevant `docs/architecture/` file right then, not at the end
+- A checklist item in `next-steps.md` is completed → check it off immediately
+
+**At session start:**
+1. Read `docs/next-steps.md` — understand exactly where the build is
+2. Read the most recent `docs/build-log/session-00X.md` — know what was just done
+3. Read any `docs/architecture/` files relevant to today's work
+4. Check `docs/decisions/decision-log.md` for constraints that apply
+
+**At session end:**
+1. Make sure the current session build log is complete and accurate
+2. Verify `docs/next-steps.md` reflects reality — all completed items checked off
+3. Commit and push the docs alongside the code changes — never leave docs out of the commit
+
+**Standing rules:**
 - Never make a significant architectural decision without logging it in `decision-log.md`
 - Never end a session without updating `next-steps.md`
 - Never start a session without reading the most recent build log
 - If something in the docs contradicts the actual code, trust the code and update the docs
+- The build log for the current session is a living document — keep it open and update it as work happens, not after

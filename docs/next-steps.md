@@ -3,65 +3,60 @@
 ## Related
 - [[vision]] — why we're building this
 - [[features]] — what we're building
-- [[session-001]] — most recent build log
+- [[session-002]] — most recent build log
 
 ---
 
-## Current Phase: 1 — Backend Foundation
+## Phase 1 — Backend Foundation
+- [x] FastAPI skeleton (main.py, config.py, db.py)
+- [x] requirements.txt + Dockerfile + .env.example
+- [x] PostgreSQL connection (SQLModel + asyncpg)
+- [x] MongoDB connection (Beanie + motor)
+- [x] Redis connection
+- [x] Auth system — register, login, JWT, refresh token, Google OAuth stub
+- [x] Users router (GET/PATCH/DELETE /users/me)
+- [x] Subjects router (full CRUD)
+- [x] Sessions router (start/stop/get, AI questions generated on start)
+- [x] Activity ingestion endpoint (POST /activity → returns fire_checkin)
+- [x] Focus scoring service (compute_focus_score, golden rule enforced)
+- [x] AI check-in service (Claude API — questions, evaluate answer, session feedback)
+- [x] Insights endpoints (daily, weekly, subjects, streaks)
+- [x] Tests — 15/15 passing on real PostgreSQL
+- [ ] Deploy to Railway (deferred — build desktop first, deploy when ready to test end-to-end)
 
-### Immediate (next session)
-- [ ] FastAPI skeleton (main.py, config.py, db.py)
-- [ ] requirements.txt
-- [ ] backend Dockerfile
-- [ ] .env.example
-- [ ] PostgreSQL connection (SQLModel + asyncpg)
-- [ ] MongoDB connection (Beanie + motor)
-- [ ] Redis connection
-- [ ] Auth system
-  - [ ] Register endpoint
-  - [ ] Login endpoint
-  - [ ] JWT generation + validation
-  - [ ] Refresh token endpoint
-  - [ ] Logout endpoint
-  - [ ] Google OAuth endpoint
+---
 
-### After Auth
-- [ ] Users router
-- [ ] Subjects router
-- [ ] Sessions router (start/stop/get)
-- [ ] Activity ingestion endpoint
-- [ ] Focus scoring service
-- [ ] AI check-in service (Claude API)
-- [ ] Insights endpoints
-- [ ] Tests (pytest)
-- [ ] Deploy to Railway
+## Phase 2 — Desktop App (current)
+Branch: `feature/desktop-app`
 
-### Phase 2 — Desktop App
-- [ ] Electron project setup
-- [ ] React + TypeScript + Tailwind
-- [ ] Menu bar tray indicator
-- [ ] Auth screens
-- [ ] Session setup flow
-- [ ] Webcam presence detection (MediaPipe)
-- [ ] Window tracking
-- [ ] AI check-in UI
-- [ ] Session summary screen
-- [ ] Build for Mac (.dmg)
+- [ ] Scaffold — Electron + Vite + React + TypeScript in `desktop/`
+- [ ] Auth screens — login, register, JWT stored via electron-store
+- [ ] Session start form — subject picker, topic, study mode, goal minutes
+- [ ] Timer screen — live clock, focus status indicator, stop button
+- [ ] Focus signal loop — POST /activity every 30s, handle fire_checkin response
+- [ ] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
+- [ ] Session summary screen — total time, real focus time, score, missed questions
+- [ ] Menu bar tray indicator — green/yellow/red dot based on focus status
+- [ ] Webcam presence detection — MediaPipe, runs locally, never sends video
+- [ ] Window/app tracking — Node.js child_process, detect active app name
+- [ ] Build for Mac (.dmg via electron-builder)
 
-### Phase 3 — Web Dashboard
+---
+
+## Phase 3 — Web Dashboard
 - [ ] Next.js setup + Vercel deploy
 - [ ] Daily + weekly dashboard
-- [ ] Subject performance
+- [ ] Subject performance charts
 - [ ] Shareable focus cards
 
-### Phase 4 — Mobile
+## Phase 4 — Mobile
 - [ ] React Native + Expo setup
-- [ ] Camera detection
-- [ ] Apple Pencil tracking
+- [ ] Camera-based presence detection
+- [ ] Apple Pencil activity tracking (iOS)
 - [ ] App Store submission
 
-### Phase 5 — Launch
+## Phase 5 — Launch
 - [ ] Stripe billing
 - [ ] Privacy audit
-- [ ] Beta (10 students)
+- [ ] Beta with 10 students
 - [ ] Product Hunt
