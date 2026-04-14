@@ -1,0 +1,80 @@
+# Environment files — never commit these
+.env
+.env.local
+.env.production
+.env.staging
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Node / JavaScript
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+
+# Electron
+desktop/dist/
+desktop/out/
+desktop/release/
+
+# Expo / React Native
+mobile/.expo/
+mobile/dist/
+mobile/build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V8
+.Trashes
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Database volumes (Docker)
+postgres_data/
+mongo_data/
+redis_data/
+
+# Alembic
+alembic/versions/*.pyc
+
+# Test outputs
+test-results/
+coverage/
