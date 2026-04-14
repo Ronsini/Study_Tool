@@ -1,6 +1,6 @@
 # Build Log — Session 002
 
-**Date:** 2026-04-13
+**Date:** 2026-04-13 → 2026-04-14
 **Phase:** 1 — Backend Foundation (complete)
 
 ## What Was Done
@@ -47,6 +47,11 @@
 
 ## Decisions Made
 - See [[decision-log]] — active_session_id FK removal, bcrypt pin
+
+## Also Done This Session
+- Updated `CLAUDE.md` — added "Live Update Rules" section so Obsidian is updated continuously during sessions, not just at the end
+- Confirmed `feature/desktop-app` branch created off latest `main`
+- Verified all docs committed and pushed before closing
 
 ## Next Session
 Begin Phase 2 — Desktop App (`feature/desktop-app` branch already created off main):
