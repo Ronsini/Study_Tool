@@ -30,7 +30,7 @@ class User(UserBase, table=True):
         primary_key=True,
     )
     hashed_password: Optional[str] = None
-    active_session_id: Optional[uuid.UUID] = Field(default=None, foreign_key="sessions.id")
+    active_session_id: Optional[uuid.UUID] = Field(default=None)  # no FK — avoids circular dependency with sessions
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
