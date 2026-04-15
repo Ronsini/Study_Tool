@@ -14,6 +14,7 @@ Skills specific to one layer live in that layer's `.claude/skills/` folder.
 | motion | Animation patterns for React/Electron using Motion v12 (Framer Motion) | Active |
 | 21st-dev-magic | AI component generation via MCP server — production-ready React + Tailwind components | Active |
 | emil-design-eng | Emil Kowalski's design engineering philosophy — easing, timing, micro-interactions, performance | Active (symlinked from .agents/skills/) |
+| impeccable (×17) | Full design skill suite by pbakaus: adapt, animate, audit, bolder, clarify, colorize, critique, delight, distill, impeccable, layout, optimize, overdrive, polish, quieter, shape, typeset | Active (symlinked from .agents/skills/) |
 
 ### MCP Servers (global `~/.claude.json`)
 | Server | Purpose | Status |
