@@ -36,6 +36,9 @@ Branch: `feature/desktop-app`
 - [x] Focus signal loop — POST /activity every 30s, handle fire_checkin response
 - [x] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
 - [x] Session summary screen — total time, real focus time, score, missed questions
+- [x] Full UI redesign — teal/orange design system, Motion animations, Emil Kowalski micro-interactions, spring check-in overlay, ripple focus rings
+- [x] Layout fixes — sticky-footer pattern, window 660×720, contrast fixes on all surfaces
+- [ ] Design polish pass — deferred, layout/function first
 - [ ] Run and test full app live in Electron window (verify electron-store ESM/CJS compat)
 - [ ] Menu bar tray indicator — green/yellow/red dot based on focus status
 - [ ] Webcam presence detection — MediaPipe, runs locally, never sends video

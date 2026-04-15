@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { api } from '../lib/api'
 import CheckInOverlay from './CheckInOverlay'
 
@@ -20,8 +21,10 @@ interface CheckInData {
   question: string
 }
 
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
+
 export default function TimerScreen({ sessionId, topic, onSessionEnded }: Props) {
-  const [elapsed, setElapsed] = useState(0) // seconds
+  const [elapsed, setElapsed] = useState(0)
   const [focusScore, setFocusScore] = useState<number | null>(null)
   const [isFocused, setIsFocused] = useState(true)
   const [checkIn, setCheckIn] = useState<CheckInData | null>(null)
@@ -30,48 +33,43 @@ export default function TimerScreen({ sessionId, topic, onSessionEnded }: Props)
   const activityInterval = useRef<ReturnType<typeof setInterval> | null>(null)
   const timerInterval = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  // Timer tick
   useEffect(() => {
     timerInterval.current = setInterval(() => setElapsed(e => e + 1), 1000)
     return () => { if (timerInterval.current) clearInterval(timerInterval.current) }
   }, [])
 
-  // Send activity signals every 30 seconds
   const sendActivity = useCallback(async () => {
     try {
       const result = await api.activity.post({
         session_id: sessionId,
-        face_present: true,        // will be replaced by MediaPipe in Phase 2 step 6
-        looking_at_screen: true,   // will be replaced by MediaPipe in Phase 2 step 6
-        phone_detected: false,     // will be replaced by MediaPipe in Phase 2 step 6
-        active_app: 'Study Tool',  // will be replaced by window tracker in Phase 2 step 7
+        face_present: true,
+        looking_at_screen: true,
+        phone_detected: false,
+        active_app: 'Study Tool',
         window_switches: windowSwitchRef.current,
         idle_seconds: 0,
       })
-
       setFocusScore(result.focus_score)
       setIsFocused(result.is_focused)
-      windowSwitchRef.current = 0 // reset counter after each report
+      windowSwitchRef.current = 0
 
-      // Golden rule: only show check-in if already distracted
       if (result.fire_checkin) {
         try {
-          const checkinRes = await fetch('http://localhost:8000/checkins/generate', {
-            headers: {
-              Authorization: `Bearer ${await window.electron.store.get('access_token')}`,
-            },
+          const token = await window.electron.store.get('access_token')
+          const res = await fetch('http://localhost:8000/checkins/generate', {
+            headers: { Authorization: `Bearer ${token}` },
           })
-          if (checkinRes.ok) {
-            const data = await checkinRes.json()
-            if (data && data.id) setCheckIn({ checkin_id: data.id, question: data.question })
+          if (res.ok) {
+            const data = await res.json()
+            if (data?.id) setCheckIn({ checkin_id: data.id, question: data.question })
           }
         } catch { /* no question available */ }
       }
-    } catch { /* network hiccup — don't crash the timer */ }
+    } catch { /* network hiccup */ }
   }, [sessionId])
 
   useEffect(() => {
-    sendActivity() // first ping immediately
+    sendActivity()
     activityInterval.current = setInterval(sendActivity, 30_000)
     return () => { if (activityInterval.current) clearInterval(activityInterval.current) }
   }, [sendActivity])
@@ -88,71 +86,99 @@ export default function TimerScreen({ sessionId, topic, onSessionEnded }: Props)
     }
   }
 
-  function formatTime(seconds: number) {
-    const h = Math.floor(seconds / 3600)
-    const m = Math.floor((seconds % 3600) / 60)
-    const s = seconds % 60
-    if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
-    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  function formatTime(s: number) {
+    const h = Math.floor(s / 3600)
+    const m = Math.floor((s % 3600) / 60)
+    const sec = s % 60
+    if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+    return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
   }
 
-  const focusColor = focusScore === null
-    ? 'text-white/30'
-    : focusScore >= 0.7
-    ? 'text-emerald-400'
-    : focusScore >= 0.4
-    ? 'text-amber-400'
-    : 'text-red-400'
+  const isWarm = focusScore !== null
+  const showRipple = isWarm && isFocused
 
-  const focusLabel = focusScore === null
-    ? 'Warming up...'
-    : isFocused
-    ? 'Focused'
-    : 'Distracted'
+  const statusLabel = !isWarm ? 'Warming up…' : isFocused ? 'Focused' : 'Distracted'
+  const statusDot = !isWarm ? 'bg-white/20' : isFocused ? 'bg-teal-400' : 'bg-amber-400'
+  const statusText = !isWarm ? 'text-white/30' : isFocused ? 'text-teal-400' : 'text-amber-400'
 
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-[#0f0f0f] relative">
-      {/* Check-in overlay — only appears when distracted */}
-      {checkIn && (
-        <CheckInOverlay
-          checkinId={checkIn.checkin_id}
-          question={checkIn.question}
-          onDismiss={() => setCheckIn(null)}
-        />
-      )}
+    <div className="flex flex-col items-center justify-between h-full bg-[#0f0f0f] relative">
 
-      <div className="flex flex-col items-center gap-8">
-        {/* Topic */}
-        <p className="text-white/40 text-sm">{topic}</p>
+      {/* Check-in overlay */}
+      <AnimatePresence>
+        {checkIn && (
+          <CheckInOverlay
+            checkinId={checkIn.checkin_id}
+            question={checkIn.question}
+            onDismiss={() => setCheckIn(null)}
+          />
+        )}
+      </AnimatePresence>
 
-        {/* Timer */}
-        <div className="text-7xl font-mono font-light text-white tracking-tight">
-          {formatTime(elapsed)}
+      {/* Top: topic label */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.05, ease: EASE }}
+        className="pt-8 flex flex-col items-center gap-1"
+      >
+        <p className="text-[10px] text-white/25 uppercase tracking-[0.12em]">Now studying</p>
+        <p className="text-[14px] text-white/65 font-medium tracking-[-0.01em] max-w-[340px] text-center leading-snug">
+          {topic}
+        </p>
+      </motion.div>
+
+      {/* Center: clock + ripple rings */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4, ease: EASE }}
+        className="flex flex-col items-center gap-6"
+      >
+        {/* Clock with ambient rings */}
+        <div className="relative flex items-center justify-center" style={{ width: 280, height: 120 }}>
+          {showRipple && (
+            <>
+              <div className="absolute inset-0 rounded-full border border-teal-500/25 ripple-ring" />
+              <div className="absolute inset-0 rounded-full border border-teal-500/15 ripple-ring"
+                style={{ animationDelay: '1.3s' }} />
+            </>
+          )}
+          <span className="tabular-nums text-[76px] font-light text-white tracking-[-0.04em] leading-none select-none">
+            {formatTime(elapsed)}
+          </span>
         </div>
 
-        {/* Focus status */}
-        <div className="flex items-center gap-2">
-          <div className={`w-2 h-2 rounded-full ${
-            focusScore === null ? 'bg-white/20' :
-            isFocused ? 'bg-emerald-400' : 'bg-red-400'
-          }`} />
-          <span className={`text-sm font-medium ${focusColor}`}>{focusLabel}</span>
-          {focusScore !== null && (
-            <span className="text-xs text-white/20">
-              {Math.round(focusScore * 100)}%
+        {/* Status badge */}
+        <div className="flex items-center gap-2.5 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full px-4 py-2">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDot} ${showRipple ? 'status-blink' : ''}`} />
+          <span className={`text-[13px] font-medium ${statusText}`}>{statusLabel}</span>
+          {isWarm && (
+            <span className="text-[12px] text-white/20 tabular-nums">
+              {Math.round(focusScore! * 100)}%
             </span>
           )}
         </div>
+      </motion.div>
 
-        {/* Stop button */}
-        <button
+      {/* Bottom: end session */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, delay: 0.1, ease: EASE }}
+        className="pb-8"
+      >
+        <motion.button
           onClick={handleStop}
           disabled={stopping}
-          className="mt-4 px-8 py-3 bg-white/5 hover:bg-white/10 disabled:opacity-50 border border-white/10 text-white text-sm font-medium rounded-xl transition-colors"
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          className="px-7 py-2.5 rounded-xl text-[13px] font-medium text-white/40 border border-[#282828] bg-[#181818] hover:border-[#3c3c3c] hover:text-white/65 disabled:opacity-40 transition-all duration-150 cursor-pointer"
         >
-          {stopping ? 'Ending session...' : 'End session'}
-        </button>
-      </div>
+          {stopping ? 'Ending…' : 'End session'}
+        </motion.button>
+      </motion.div>
+
     </div>
   )
 }

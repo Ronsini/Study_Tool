@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
@@ -15,6 +16,8 @@ interface SessionSummary {
   ai_feedback: string
 }
 
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
+
 function AppContent() {
   const { user, loading } = useAuth()
   const [screen, setScreen] = useState<Screen>('login')
@@ -22,51 +25,68 @@ function AppContent() {
   const [sessionTopic, setSessionTopic] = useState('')
   const [summary, setSummary] = useState<SessionSummary | null>(null)
 
+  let key: string
+  let content: React.ReactNode
+
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full bg-[#0f0f0f]">
-        <div className="text-white/20 text-sm">Loading...</div>
+    key = 'loading'
+    content = (
+      <div className="flex items-center justify-center h-full bg-[#0a0a0a]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-5 h-5 rounded-full border-2 border-white/10 border-t-teal-500 spin" />
+          <span className="text-[11px] text-white/20 uppercase tracking-[0.1em]">Loading</span>
+        </div>
       </div>
     )
-  }
-
-  // Not logged in
-  if (!user) {
-    if (screen === 'register') {
-      return <RegisterScreen onSwitchToLogin={() => setScreen('login')} />
-    }
-    return <LoginScreen onSwitchToRegister={() => setScreen('register')} />
-  }
-
-  // Logged in — session flow
-  if (screen === 'timer' && sessionId) {
-    return (
+  } else if (!user) {
+    key = screen
+    content = screen === 'register'
+      ? <RegisterScreen onSwitchToLogin={() => setScreen('login')} />
+      : <LoginScreen onSwitchToRegister={() => setScreen('register')} />
+  } else if (screen === 'timer' && sessionId) {
+    key = 'timer'
+    content = (
       <TimerScreen
         sessionId={sessionId}
         topic={sessionTopic}
         onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
       />
     )
-  }
-
-  if (screen === 'summary' && summary) {
-    return (
+  } else if (screen === 'summary' && summary) {
+    key = 'summary'
+    content = (
       <SummaryScreen
         summary={summary}
         topic={sessionTopic}
         onStartNew={() => { setSummary(null); setScreen('start') }}
       />
     )
+  } else {
+    key = 'start'
+    content = (
+      <StartSessionScreen
+        onSessionStarted={(id, topic) => {
+          setSessionId(id)
+          setSessionTopic(topic)
+          setScreen('timer')
+        }}
+      />
+    )
   }
 
   return (
-    <StartSessionScreen
-      onSessionStarted={(id, topic) => {
-        setSessionId(id)
-        setSessionTopic(topic)
-        setScreen('timer')
-      }}
-    />
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={key}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.22, ease: EASE }}
+        className="h-full"
+      >
+        {content}
+      </motion.div>
+    </AnimatePresence>
   )
 }
 
