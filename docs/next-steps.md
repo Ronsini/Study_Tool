@@ -29,13 +29,14 @@
 ## Phase 2 — Desktop App (current)
 Branch: `feature/desktop-app`
 
-- [ ] Scaffold — Electron + Vite + React + TypeScript in `desktop/`
-- [ ] Auth screens — login, register, JWT stored via electron-store
-- [ ] Session start form — subject picker, topic, study mode, goal minutes
-- [ ] Timer screen — live clock, focus status indicator, stop button
-- [ ] Focus signal loop — POST /activity every 30s, handle fire_checkin response
-- [ ] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
-- [ ] Session summary screen — total time, real focus time, score, missed questions
+- [x] Scaffold — Electron + Vite + React + TypeScript in `desktop/`
+- [x] Auth screens — login, register, JWT stored via electron-store
+- [x] Session start form — subject picker, topic, study mode, goal minutes
+- [x] Timer screen — live clock, focus status indicator, stop button
+- [x] Focus signal loop — POST /activity every 30s, handle fire_checkin response
+- [x] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
+- [x] Session summary screen — total time, real focus time, score, missed questions
+- [ ] Run and test full app live in Electron window (verify electron-store ESM/CJS compat)
 - [ ] Menu bar tray indicator — green/yellow/red dot based on focus status
 - [ ] Webcam presence detection — MediaPipe, runs locally, never sends video
 - [ ] Window/app tracking — Node.js child_process, detect active app name
@@ -44,7 +45,7 @@ Branch: `feature/desktop-app`
 ---
 
 ## Phase 3 — Web Dashboard
-- [ ] Next.js setup + Vercel deploy
+[ ] Next.js setup + Vercel deploy
 - [ ] Daily + weekly dashboard
 - [ ] Subject performance charts
 - [ ] Shareable focus cards
