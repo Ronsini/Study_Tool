@@ -10,11 +10,6 @@ Skills specific to one layer live in that layer's `.claude/skills/` folder.
 ### Project-Wide (this folder)
 | Skill | Purpose | Status |
 |-------|---------|--------|
-| _(none yet)_ | | |
-
-### Desktop (`desktop/.claude/skills/`)
-| Skill | Purpose | Status |
-|-------|---------|--------|
 | ui-ux-pro-max | Design system — 67 styles, 161 color palettes, 57 typography pairings, 99 UX rules | Active |
 
 ### MCP Servers (global `~/.claude.json`)
