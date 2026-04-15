@@ -13,6 +13,7 @@ Skills specific to one layer live in that layer's `.claude/skills/` folder.
 | ui-ux-pro-max | Design system — 67 styles, 161 color palettes, 57 typography pairings, 99 UX rules | Active |
 | motion | Animation patterns for React/Electron using Motion v12 (Framer Motion) | Active |
 | 21st-dev-magic | AI component generation via MCP server — production-ready React + Tailwind components | Active |
+| emil-design-eng | Emil Kowalski's design engineering philosophy — easing, timing, micro-interactions, performance | Active (symlinked from .agents/skills/) |
 
 ### MCP Servers (global `~/.claude.json`)
 | Server | Purpose | Status |
