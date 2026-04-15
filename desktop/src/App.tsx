@@ -6,14 +6,27 @@ import RegisterScreen from './screens/RegisterScreen'
 import StartSessionScreen from './screens/StartSessionScreen'
 import TimerScreen from './screens/TimerScreen'
 import SummaryScreen from './screens/SummaryScreen'
+import HistoryScreen from './screens/HistoryScreen'
+import ProfileScreen from './screens/ProfileScreen'
+import BottomNav from './components/BottomNav'
+import type { NavTab } from './components/BottomNav'
 
-type Screen = 'login' | 'register' | 'start' | 'timer' | 'summary'
+type Screen = 'login' | 'register' | 'start' | 'timer' | 'summary' | 'history' | 'profile'
+
+interface DistractionEvent {
+  type: string
+  label: string
+  source: string | null
+  windows: number
+  minutes: number
+}
 
 interface SessionSummary {
-  total_minutes: number
-  real_focus_min: number
-  focus_score: number
-  ai_feedback: string
+  total_minutes: number | null
+  real_focus_min: number | null
+  focus_score: number | null
+  ai_feedback: string | null
+  distraction_breakdown: DistractionEvent[]
 }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
@@ -23,14 +36,12 @@ function AppContent() {
   const [screen, setScreen] = useState<Screen>('login')
   const [sessionId, setSessionId] = useState('')
   const [sessionTopic, setSessionTopic] = useState('')
+  const [sessionStudyMode, setSessionStudyMode] = useState('mac_pc')
   const [summary, setSummary] = useState<SessionSummary | null>(null)
 
-  let key: string
-  let content: React.ReactNode
-
+  // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
-    key = 'loading'
-    content = (
+    return (
       <div className="flex items-center justify-center h-full bg-[#0a0a0a]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-5 h-5 rounded-full border-2 border-white/10 border-t-teal-500 spin" />
@@ -38,22 +49,54 @@ function AppContent() {
         </div>
       </div>
     )
-  } else if (!user) {
-    key = screen
-    content = screen === 'register'
-      ? <RegisterScreen onSwitchToLogin={() => setScreen('login')} />
-      : <LoginScreen onSwitchToRegister={() => setScreen('register')} />
-  } else if (screen === 'timer' && sessionId) {
-    key = 'timer'
-    content = (
+  }
+
+  // ── Auth screens (no nav) ─────────────────────────────────────────────────
+  if (!user) {
+    return (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={screen}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.22, ease: EASE }}
+          className="h-full"
+        >
+          {screen === 'register'
+            ? <RegisterScreen onSwitchToLogin={() => setScreen('login')} />
+            : <LoginScreen onSwitchToRegister={() => setScreen('register')} />
+          }
+        </motion.div>
+      </AnimatePresence>
+    )
+  }
+
+  // ── Active timer (no nav — user should not navigate away mid-session) ─────
+  if (screen === 'timer' && sessionId) {
+    return (
       <TimerScreen
         sessionId={sessionId}
         topic={sessionTopic}
+        studyMode={sessionStudyMode}
         onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
       />
     )
-  } else if (screen === 'summary' && summary) {
-    key = 'summary'
+  }
+
+  // ── Main app layout with bottom nav ───────────────────────────────────────
+  const navTab: NavTab =
+    screen === 'history' ? 'history' :
+    screen === 'profile' ? 'profile' :
+    'home'
+
+  function handleNavChange(tab: NavTab) {
+    if (tab === 'home') setScreen('start')
+    else setScreen(tab)
+  }
+
+  let content: React.ReactNode
+  if (screen === 'summary' && summary) {
     content = (
       <SummaryScreen
         summary={summary}
@@ -61,13 +104,17 @@ function AppContent() {
         onStartNew={() => { setSummary(null); setScreen('start') }}
       />
     )
+  } else if (screen === 'history') {
+    content = <HistoryScreen />
+  } else if (screen === 'profile') {
+    content = <ProfileScreen />
   } else {
-    key = 'start'
     content = (
       <StartSessionScreen
-        onSessionStarted={(id, topic) => {
+        onSessionStarted={(id, topic, mode) => {
           setSessionId(id)
           setSessionTopic(topic)
+          setSessionStudyMode(mode)
           setScreen('timer')
         }}
       />
@@ -75,18 +122,23 @@ function AppContent() {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={key}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.22, ease: EASE }}
-        className="h-full"
-      >
-        {content}
-      </motion.div>
-    </AnimatePresence>
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={screen}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: EASE }}
+            className="h-full"
+          >
+            {content}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <BottomNav active={navTab} onChange={handleNavChange} />
+    </div>
   )
 }
 

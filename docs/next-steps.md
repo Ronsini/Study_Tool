@@ -38,11 +38,15 @@ Branch: `feature/desktop-app`
 - [x] Session summary screen — total time, real focus time, score, missed questions
 - [x] Full UI redesign — teal/orange design system, Motion animations, Emil Kowalski micro-interactions, spring check-in overlay, ripple focus rings
 - [x] Layout fixes — sticky-footer pattern, window 660×720, contrast fixes on all surfaces
-- [ ] Design polish pass — deferred, layout/function first
-- [ ] Run and test full app live in Electron window (verify electron-store ESM/CJS compat)
-- [ ] Menu bar tray indicator — green/yellow/red dot based on focus status
+- [x] Run and test full app live in Electron window — core loop proven end-to-end (session 006)
+- [x] Menu bar tray indicator — teal/amber/gray dot via IPC, updates on every /activity response (session 006)
+- [x] Window/app tracking — AppleScript via child_process, real active_app + window switch count (session 006)
+- [x] Distraction breakdown in summary — grouped by type+source, Pro paywall with blur+lock overlay (session 006/007)
+- [x] Bottom tab navigation — Home, History, Profile tabs; timer is nav-free; session 007
+- [x] History screen — lists past sessions with subject color, date, score (session 007)
+- [x] Profile screen — user card, subscription badge, upgrade CTA, sign out (session 007)
 - [ ] Webcam presence detection — MediaPipe, runs locally, never sends video
-- [ ] Window/app tracking — Node.js child_process, detect active app name
+- [ ] Design polish pass — deferred until webcam done
 - [ ] Build for Mac (.dmg via electron-builder)
 
 ---

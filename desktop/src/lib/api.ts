@@ -77,26 +77,65 @@ export const api = {
       body: JSON.stringify(payload),
     }),
     stop: (session_id: string) =>
-      request<{ total_minutes: number; real_focus_min: number; focus_score: number; ai_feedback: string }>(
-        '/sessions/stop',
-        { method: 'POST', body: JSON.stringify({ session_id }) }
-      ),
+      request<{
+        total_minutes: number | null
+        real_focus_min: number | null
+        focus_score: number | null
+        ai_feedback: string | null
+        distraction_breakdown: Array<{
+          type: string
+          label: string
+          source: string | null
+          windows: number
+          minutes: number
+        }>
+      }>('/sessions/stop', { method: 'POST', body: JSON.stringify({ session_id }) }),
+    list: (limit = 20, offset = 0) =>
+      request<Array<{
+        id: string
+        subject_id: string
+        topic: string
+        study_mode: string
+        started_at: string
+        ended_at: string | null
+        total_minutes: number | null
+        real_focus_min: number | null
+        focus_score: number | null
+        distraction_count: number
+        ai_feedback: string | null
+      }>>(`/sessions?limit=${limit}&offset=${offset}`),
   },
 
   activity: {
     post: (payload: {
       session_id: string
-      face_present: boolean
-      looking_at_screen: boolean
-      phone_detected: boolean
-      active_app: string
-      window_switches: number
-      idle_seconds: number
-    }) =>
-      request<{ is_focused: boolean; focus_score: number; distraction_type: string | null; fire_checkin: boolean }>(
+      signals: {
+        face_present: boolean
+        looking_at_screen: boolean
+        phone_detected: boolean
+        active_app: string
+        browser_url: string | null
+        window_switches: number
+        idle_seconds: number
+        study_mode: string
+      }
+    }) => {
+      const now = Math.floor(Date.now() / 1000)
+      return request<{ is_focused: boolean; focus_score: number; distraction_type: string | null; fire_checkin: boolean }>(
         '/activity',
-        { method: 'POST', body: JSON.stringify(payload) }
-      ),
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            session_id: payload.session_id,
+            event_type: 'focus_window',
+            timestamp_ms: Date.now(),
+            window_start: now - 30,
+            window_end: now,
+            signals: payload.signals,
+          }),
+        }
+      )
+    },
   },
 
   checkins: {

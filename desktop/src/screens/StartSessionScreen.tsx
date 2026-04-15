@@ -17,7 +17,7 @@ const SUBJECT_COLORS = [
 const DURATIONS = [25, 45, 60, 90, 120, 180]
 
 interface Subject { id: string; name: string; color: string }
-interface Props { onSessionStarted: (sessionId: string, topic: string) => void }
+interface Props { onSessionStarted: (sessionId: string, topic: string, studyMode: string) => void }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
 const INPUT = 'w-full bg-[#1c1c1c] border border-[#2e2e2e] hover:border-[#3e3e3e] focus:border-teal-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 transition-colors duration-150'
@@ -53,6 +53,17 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
     } catch { setError('Failed to create subject') }
   }
 
+  async function startSession() {
+    const session = await api.sessions.start({
+      subject_id: selectedSubject,
+      topic: topic.trim(),
+      study_mode: studyMode,
+      duration_goal_min: durationGoal,
+      goal: goal.trim(),
+    })
+    onSessionStarted(session.id, topic.trim(), studyMode)
+  }
+
   async function handleStart(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedSubject) { setError('Select a subject'); return }
@@ -60,17 +71,22 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
     setError('')
     setLoading(true)
     try {
-      const session = await api.sessions.start({
-        subject_id: selectedSubject,
-        topic: topic.trim(),
-        study_mode: studyMode,
-        duration_goal_min: durationGoal,
-        goal: goal.trim(),
-      })
-      onSessionStarted(session.id, topic.trim())
+      await startSession()
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to start session')
-      setLoading(false)
+      const msg = err instanceof Error ? err.message : 'Failed to start session'
+      // If a previous session is stuck active (e.g. app crashed), clear it and retry
+      if (msg === 'A session is already active') {
+        try {
+          await api.sessions.stop('')
+          await startSession()
+        } catch {
+          setError('Could not clear previous session. Please restart the app.')
+          setLoading(false)
+        }
+      } else {
+        setError(msg)
+        setLoading(false)
+      }
     }
   }
 
