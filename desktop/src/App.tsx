@@ -8,8 +8,8 @@ import TimerScreen from './screens/TimerScreen'
 import SummaryScreen from './screens/SummaryScreen'
 import HistoryScreen from './screens/HistoryScreen'
 import ProfileScreen from './screens/ProfileScreen'
-import BottomNav from './components/BottomNav'
-import type { NavTab } from './components/BottomNav'
+import SideNav from './components/SideNav'
+import type { NavTab } from './components/SideNav'
 
 type Screen = 'login' | 'register' | 'start' | 'timer' | 'summary' | 'history' | 'profile'
 
@@ -44,14 +44,14 @@ function AppContent() {
     return (
       <div className="flex items-center justify-center h-full bg-[#0a0a0a]">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-5 h-5 rounded-full border-2 border-white/10 border-t-teal-500 spin" />
+          <div className="w-5 h-5 rounded-full border-2 border-white/10 border-t-[#22c55e] spin" />
           <span className="text-[11px] text-white/20 uppercase tracking-[0.1em]">Loading</span>
         </div>
       </div>
     )
   }
 
-  // ── Auth screens (no nav) ─────────────────────────────────────────────────
+  // ── Auth screens (full-width, no sidebar) ─────────────────────────────────
   if (!user) {
     return (
       <AnimatePresence mode="wait">
@@ -75,20 +75,18 @@ function AppContent() {
   // ── Active timer (no nav — user should not navigate away mid-session) ─────
   if (screen === 'timer' && sessionId) {
     return (
-      <div className="flex h-full justify-center bg-[#0f0f0f]">
-        <div className="w-full max-w-[720px]">
-          <TimerScreen
-            sessionId={sessionId}
-            topic={sessionTopic}
-            studyMode={sessionStudyMode}
-            onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
-          />
-        </div>
+      <div className="h-full bg-[#0f0f0f]">
+        <TimerScreen
+          sessionId={sessionId}
+          topic={sessionTopic}
+          studyMode={sessionStudyMode}
+          onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
+        />
       </div>
     )
   }
 
-  // ── Main app layout with bottom nav ───────────────────────────────────────
+  // ── Main app — sidebar + content ──────────────────────────────────────────
   const navTab: NavTab =
     screen === 'history' ? 'history' :
     screen === 'profile' ? 'profile' :
@@ -126,10 +124,13 @@ function AppContent() {
   }
 
   return (
-    <div className="flex h-full justify-center bg-[#080808]">
-      {/* Centered column — content + nav stay inside max-720px at any window size */}
-      <div className="w-full max-w-[720px] flex flex-col">
-        <div className="flex-1 overflow-hidden">
+    <div className="flex h-full bg-[#0a0a0a]">
+      {/* Left sidebar — desktop nav */}
+      <SideNav active={navTab} onChange={handleNavChange} />
+
+      {/* Content area — max-width prevents excessive stretch on wide windows */}
+      <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
+        <div className="w-full max-w-[820px] h-full flex flex-col overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={screen}
@@ -143,7 +144,6 @@ function AppContent() {
             </motion.div>
           </AnimatePresence>
         </div>
-        <BottomNav active={navTab} onChange={handleNavChange} />
       </div>
     </div>
   )
