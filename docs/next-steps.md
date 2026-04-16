@@ -46,14 +46,14 @@ Branch: `feature/desktop-app`
 - [x] History screen — lists past sessions with subject color, date, score (session 007)
 - [x] Profile screen — user card, subscription badge, upgrade CTA, sign out (session 007)
 - [x] skills.md baked in — all 23 skill principles in one file, loaded at session start (session 008)
+- [x] **REDESIGN ALL SCREENS** — applied all skills from skills.md (session 009)
+  - [x] Fix teal → green everywhere (teal is not in the color system)
+  - [x] Kill 3-stat-card identical grid in SummaryScreen → asymmetric hero layout
+  - [x] Kill emoji icons in StartSessionScreen study mode picker → clean flat list
+  - [x] Apply 4-step opacity hierarchy across all screens
+  - [x] whileHover 1.015 / whileTap 0.975 on every pressable surface
 - [ ] Webcam presence detection — MediaPipe, runs locally, never sends video
-- [ ] **REDESIGN ALL SCREENS** — next session priority (see session-008 log for exact plan)
-  - [ ] Fix teal → green everywhere (teal is not in the color system)
-  - [ ] Kill 3-stat-card identical grid in SummaryScreen
-  - [ ] Kill emoji icons in StartSessionScreen study mode picker
-  - [ ] Apply 4-step opacity hierarchy across all screens
-  - [ ] Vary spacing for rhythm — no same-gap everywhere
-- [ ] Design polish pass — runs after redesign
+- [ ] Design polish pass — spacing rhythm, micro-details
 - [ ] Build for Mac (.dmg via electron-builder)
 
 ---

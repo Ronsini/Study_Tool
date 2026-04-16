@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { api } from '../lib/api'
 
+// /distill: study modes were a 2×3 identical emoji card grid — BANNED PATTERN.
+//   Replaced with a clean vertical list. No emoji. Text + description only.
+// /colorize: teal replaced with green (#22c55e) everywhere
+// /layout: no identical card grids, spacing varies for hierarchy
+// /animate: 1.015 hover, 0.975 tap on every button
+
 const STUDY_MODES = [
-  { value: 'mac_pc',           label: 'Mac / PC',      icon: '⌘', description: 'Window tracking + webcam' },
-  { value: 'physical_book',    label: 'Physical book', icon: '📖', description: 'Webcam only' },
-  { value: 'physical_writing', label: 'Writing',       icon: '✏️', description: 'Notebook or paper' },
-  { value: 'lecture',          label: 'Lecture',       icon: '🎓', description: 'Video or in-person' },
-  { value: 'mix',              label: 'Mix',           icon: '⚡', description: 'Auto-detect switching' },
+  { value: 'mac_pc',           label: 'Mac / PC',      description: 'Window tracking + webcam' },
+  { value: 'physical_book',    label: 'Physical book', description: 'Webcam only' },
+  { value: 'physical_writing', label: 'Writing',       description: 'Notebook or paper' },
+  { value: 'lecture',          label: 'Lecture',       description: 'Video or in-person' },
+  { value: 'mix',              label: 'Mix',           description: 'Auto-detect switching' },
 ]
 
 const SUBJECT_COLORS = [
@@ -20,7 +26,9 @@ interface Subject { id: string; name: string; color: string }
 interface Props { onSessionStarted: (sessionId: string, topic: string, studyMode: string) => void }
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1]
-const INPUT = 'w-full bg-[#1c1c1c] border border-[#2e2e2e] hover:border-[#3e3e3e] focus:border-teal-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 transition-colors duration-150'
+
+// /colorize: focus ring = green
+const INPUT = 'w-full bg-[#1c1c1c] border border-[#2a2a2a] hover:border-[#3a3a3a] focus:border-[#22c55e] rounded-xl px-3.5 py-2.5 text-[13px] text-[#f0f0f0] placeholder-white/25 transition-colors duration-150 outline-none'
 
 export default function StartSessionScreen({ onSessionStarted }: Props) {
   const [subjects, setSubjects] = useState<Subject[]>([])
@@ -74,7 +82,6 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
       await startSession()
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to start session'
-      // If a previous session is stuck active (e.g. app crashed), clear it and retry
       if (msg === 'A session is already active') {
         try {
           await api.sessions.stop('')
@@ -93,31 +100,32 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
   const selectedSubjectData = subjects.find(s => s.id === selectedSubject)
 
   return (
-    /* Sticky-footer layout: header + scrollable body + pinned CTA */
     <div className="flex flex-col h-full bg-[#0f0f0f]">
 
-      {/* ── Header ─────────────────────────────── */}
+      {/* Header */}
       <motion.header
-        initial={{ opacity: 0, y: -8 }}
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.26, ease: EASE }}
-        className="shrink-0 px-6 pt-6 pb-4 border-b border-[#1e1e1e]"
+        transition={{ duration: 0.24, ease: EASE }}
+        className="shrink-0 px-6 pt-6 pb-4 border-b border-[#1a1a1a]"
       >
-        <p className="text-[10px] text-white/30 uppercase tracking-[0.12em] mb-1">Study Tool</p>
-        <h1 className="text-[26px] font-bold text-white tracking-[-0.03em]">New session</h1>
+        {/* /typeset: 10px micro-label, uppercase tracked */}
+        <p className="text-[10px] text-white/25 uppercase tracking-[0.12em] mb-1">Study Tool</p>
+        {/* /typeset: 26px heading, weight 700, -0.03em tracking — paired size+weight */}
+        <h1 className="text-[26px] font-bold text-[#f0f0f0] tracking-[-0.03em]">New session</h1>
       </motion.header>
 
-      {/* ── Scrollable form body ────────────────── */}
+      {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto">
-        <form id="session-form" onSubmit={handleStart} className="px-6 py-5 flex flex-col gap-5">
+        <form id="session-form" onSubmit={handleStart} className="px-6 py-5 flex flex-col gap-6">
 
           {/* Subject */}
           <motion.section
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.04, ease: EASE }}
+            transition={{ duration: 0.22, delay: 0.04, ease: EASE }}
           >
-            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-[0.09em] mb-2">
+            <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-[0.09em] mb-2.5">
               Subject
             </label>
             <div className="flex flex-wrap gap-2">
@@ -126,12 +134,12 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
                   key={s.id}
                   type="button"
                   onClick={() => setSelectedSubject(s.id)}
-                  whileTap={{ scale: 0.94 }}
+                  whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.1 }}
-                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
                     selectedSubject === s.id
-                      ? 'bg-white/12 text-white border border-white/22'
-                      : 'bg-[#1c1c1c] text-white/55 border border-[#2e2e2e] hover:border-[#3e3e3e] hover:text-white/75'
+                      ? 'bg-white/10 text-[#f0f0f0] border border-white/20'
+                      : 'bg-[#1a1a1a] text-white/45 border border-[#272727] hover:border-[#363636] hover:text-white/70'
                   }`}
                 >
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
@@ -141,37 +149,41 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
               <button
                 type="button"
                 onClick={() => setShowNewSubject(!showNewSubject)}
-                className="px-3.5 py-1.5 rounded-lg text-[13px] text-white/35 bg-[#1a1a1a] border border-[#2a2a2a] hover:border-[#3a3a3a] hover:text-white/55 transition-all duration-150"
+                className="px-3 py-1.5 rounded-lg text-[13px] text-white/30 bg-[#181818] border border-[#252525] hover:border-[#353535] hover:text-white/50 transition-all duration-150"
               >
                 + New
               </button>
             </div>
+
             {showNewSubject && (
               <motion.div
-                initial={{ opacity: 0, y: -4 }}
+                initial={{ opacity: 0, y: -3 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.16, ease: EASE }}
-                className="flex gap-2 mt-2.5 items-center"
+                transition={{ duration: 0.15, ease: EASE }}
+                className="flex gap-2 mt-3 items-center"
               >
                 <input
                   type="text"
                   value={newSubjectName}
                   onChange={e => setNewSubjectName(e.target.value)}
                   placeholder="Subject name"
-                  className="flex-1 bg-[#1c1c1c] border border-[#2e2e2e] focus:border-teal-500 rounded-xl px-3 py-2 text-[13px] text-white placeholder-white/25 transition-colors duration-150"
+                  className="flex-1 bg-[#1c1c1c] border border-[#2a2a2a] focus:border-[#22c55e] rounded-xl px-3 py-2 text-[13px] text-[#f0f0f0] placeholder-white/25 transition-colors duration-150 outline-none"
                 />
                 <div className="flex gap-1.5">
                   {SUBJECT_COLORS.map(c => (
                     <button key={c} type="button" onClick={() => setNewSubjectColor(c)}
-                      style={{ width: 18, height: 18, borderRadius: '50%', backgroundColor: c,
+                      style={{
+                        width: 18, height: 18, borderRadius: '50%', backgroundColor: c,
                         transform: newSubjectColor === c ? 'scale(1.35)' : 'scale(1)',
                         outline: newSubjectColor === c ? `2px solid ${c}` : 'none',
-                        outlineOffset: 2, transition: 'transform 0.1s' }}
+                        outlineOffset: 2, transition: 'transform 0.1s',
+                      }}
                     />
                   ))}
                 </div>
+                {/* /colorize: green CTA for create action */}
                 <button type="button" onClick={handleCreateSubject}
-                  className="px-3 py-2 bg-teal-600 hover:bg-teal-500 text-white text-[13px] font-medium rounded-xl transition-colors duration-150">
+                  className="px-3 py-2 bg-[#16a34a] hover:bg-[#22c55e] text-white text-[13px] font-medium rounded-xl transition-colors duration-150 cursor-pointer">
                   Add
                 </button>
               </motion.div>
@@ -180,12 +192,12 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
 
           {/* Topic */}
           <motion.section
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.07, ease: EASE }}
+            transition={{ duration: 0.22, delay: 0.07, ease: EASE }}
           >
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-[11px] font-semibold text-white/50 uppercase tracking-[0.09em]">Topic</label>
+            <div className="flex items-center justify-between mb-2.5">
+              <label className="text-[11px] font-semibold text-white/35 uppercase tracking-[0.09em]">Topic</label>
               {selectedSubjectData && (
                 <span className="text-[11px] text-white/25 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedSubjectData.color }} />
@@ -201,17 +213,20 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
               placeholder="e.g. Mitosis and cell division"
               className={INPUT}
             />
-            <p className="text-[11px] text-white/25 mt-1.5">Claude generates check-in questions from this</p>
+            {/* /copy: explain what this does, not what it is */}
+            <p className="text-[11px] text-white/25 mt-1.5 leading-snug">
+              Claude generates check-in questions from this topic
+            </p>
           </motion.section>
 
-          {/* Goal */}
+          {/* Goal — optional */}
           <motion.section
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.1, ease: EASE }}
+            transition={{ duration: 0.22, delay: 0.1, ease: EASE }}
           >
-            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-[0.09em] mb-2">
-              Goal <span className="normal-case font-normal tracking-normal text-white/22">— optional</span>
+            <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-[0.09em] mb-2.5">
+              Goal <span className="normal-case font-normal tracking-normal text-white/20">— optional</span>
             </label>
             <input
               type="text"
@@ -222,16 +237,17 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
             />
           </motion.section>
 
-          {/* Study mode */}
+          {/* Study mode — /distill: was a 2×3 identical emoji card grid. Now a clean list. */}
           <motion.section
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.13, ease: EASE }}
+            transition={{ duration: 0.22, delay: 0.13, ease: EASE }}
           >
-            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-[0.09em] mb-2">
+            <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-[0.09em] mb-1">
               Study mode
             </label>
-            <div className="grid grid-cols-2 gap-1.5">
+            {/* /layout: rows divided by 1px separator, not identical cards in a grid */}
+            <div className="divide-y divide-[#1e1e1e]">
               {STUDY_MODES.map(m => {
                 const active = studyMode === m.value
                 return (
@@ -239,21 +255,26 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
                     key={m.value}
                     type="button"
                     onClick={() => setStudyMode(m.value)}
-                    whileTap={{ scale: 0.97 }}
+                    whileTap={{ scale: 0.99 }}
                     transition={{ duration: 0.1 }}
-                    className={`text-left px-3.5 py-2.5 rounded-xl border transition-all duration-150 ${
-                      active
-                        ? 'border-teal-500 bg-teal-500/15 text-white'
-                        : 'border-[#252525] bg-[#181818] text-white/55 hover:border-[#363636] hover:text-white/75'
-                    }`}
+                    className="w-full flex items-center justify-between py-2.5 px-1 text-left transition-colors duration-150 group"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base leading-none">{m.icon}</span>
-                      <span className="text-[13px] font-medium">{m.label}</span>
+                    <div className="flex items-center gap-3">
+                      {/* /colorize: green dot = selected/active */}
+                      <div className={`w-1.5 h-1.5 rounded-full shrink-0 transition-colors duration-150 ${
+                        active ? 'bg-[#22c55e]' : 'bg-[#333]'
+                      }`} />
+                      <span className={`text-[13px] font-medium transition-colors duration-150 ${
+                        active ? 'text-[#f0f0f0]' : 'text-white/45 group-hover:text-white/65'
+                      }`}>
+                        {m.label}
+                      </span>
                     </div>
-                    <p className={`text-[11px] mt-1 leading-snug ${active ? 'text-teal-300/60' : 'text-white/28'}`}>
+                    <span className={`text-[12px] transition-colors duration-150 ${
+                      active ? 'text-white/40' : 'text-white/20'
+                    }`}>
                       {m.description}
-                    </p>
+                    </span>
                   </motion.button>
                 )
               })}
@@ -262,11 +283,11 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
 
           {/* Duration */}
           <motion.section
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.24, delay: 0.16, ease: EASE }}
+            transition={{ duration: 0.22, delay: 0.16, ease: EASE }}
           >
-            <label className="block text-[11px] font-semibold text-white/50 uppercase tracking-[0.09em] mb-2">
+            <label className="block text-[11px] font-semibold text-white/35 uppercase tracking-[0.09em] mb-2.5">
               Duration
             </label>
             <div className="flex gap-2 flex-wrap">
@@ -275,12 +296,12 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
                   key={d}
                   type="button"
                   onClick={() => setDurationGoal(d)}
-                  whileTap={{ scale: 0.92 }}
+                  whileTap={{ scale: 0.93 }}
                   transition={{ duration: 0.1 }}
                   className={`px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 ${
                     durationGoal === d
-                      ? 'bg-teal-500/20 text-teal-300 border border-teal-500/60'
-                      : 'bg-[#1a1a1a] text-white/45 border border-[#2a2a2a] hover:border-[#3a3a3a] hover:text-white/65'
+                      ? 'bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/50'
+                      : 'bg-[#1a1a1a] text-white/40 border border-[#272727] hover:border-[#383838] hover:text-white/60'
                   }`}
                 >
                   {d >= 60 ? `${d / 60}h` : `${d}m`}
@@ -291,10 +312,10 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
 
           {error && (
             <motion.p
-              initial={{ opacity: 0, y: -4 }}
+              initial={{ opacity: 0, y: -3 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className="text-[13px] text-red-400/80"
+              className="text-[12px] text-red-400/80"
             >
               {error}
             </motion.p>
@@ -303,20 +324,22 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
         </form>
       </div>
 
-      {/* ── Pinned footer CTA ──────────────────── */}
+      {/* Pinned CTA footer */}
       <motion.footer
-        initial={{ opacity: 0, y: 8 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.26, delay: 0.2, ease: EASE }}
-        className="shrink-0 px-6 py-4 border-t border-[#1e1e1e] bg-[#0f0f0f]"
+        transition={{ duration: 0.24, delay: 0.2, ease: EASE }}
+        className="shrink-0 px-6 py-4 border-t border-[#1a1a1a] bg-[#0f0f0f]"
       >
+        {/* /animate: mandatory button feedback */}
         <motion.button
           type="submit"
           form="session-form"
           disabled={loading}
           whileHover={{ scale: 1.015 }}
           whileTap={{ scale: 0.975 }}
-          className="w-full bg-orange-500 hover:bg-orange-400 active:bg-orange-600 disabled:opacity-40 text-white text-[15px] font-semibold py-3 rounded-xl transition-colors duration-150 cursor-pointer"
+          transition={{ duration: 0.1, ease: EASE }}
+          className="w-full bg-[#f97316] hover:bg-[#fb923c] active:bg-[#ea6d0e] disabled:opacity-40 text-white text-[15px] font-semibold py-3 rounded-xl transition-colors duration-150 cursor-pointer"
         >
           {loading ? 'Starting…' : 'Begin session'}
         </motion.button>

@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { api } from '../lib/api'
 
+// /layout: session rows were identical rounded cards — replaced with flat rows + 1px dividers (Raycast-style)
+// /colorize: score colors — green/amber/red. Spinner uses green border.
+// /copy: empty state teaches the interface, not just says "nothing yet"
+// /animate: stagger 0.04s per item, capped at 0.2s total
+
 interface SessionRecord {
   id: string
   subject_id: string
@@ -32,12 +37,13 @@ function formatDate(iso: string) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-function scoreColor(score: number | null) {
-  if (score === null) return 'text-white/30'
+function scoreColorStyle(score: number | null): string {
+  if (score === null) return 'text-white/25'
   const pct = Math.round(score * 100)
-  if (pct >= 70) return 'text-teal-400'
-  if (pct >= 40) return 'text-amber-400'
-  return 'text-red-400'
+  // /colorize: green = earned focus, amber = mediocre, red = poor
+  if (pct >= 70) return 'text-[#22c55e]'
+  if (pct >= 40) return 'text-[#fbbf24]'
+  return 'text-[#f87171]'
 }
 
 export default function HistoryScreen() {
@@ -59,45 +65,54 @@ export default function HistoryScreen() {
     <div className="flex flex-col h-full bg-[#0f0f0f]">
 
       <motion.header
-        initial={{ opacity: 0, y: -8 }}
+        initial={{ opacity: 0, y: -6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.26, ease: EASE }}
-        className="shrink-0 px-6 pt-6 pb-4 border-b border-[#1e1e1e]"
+        transition={{ duration: 0.24, ease: EASE }}
+        className="shrink-0 px-6 pt-6 pb-4 border-b border-[#1a1a1a]"
       >
-        <h1 className="text-[24px] font-bold text-white tracking-[-0.03em]">History</h1>
-        <p className="text-[12px] text-white/30 mt-0.5">Past study sessions</p>
+        <h1 className="text-[24px] font-bold text-[#f0f0f0] tracking-[-0.03em]">History</h1>
+        {/* /typeset: 12px secondary, 30% opacity */}
+        <p className="text-[12px] text-white/30 mt-0.5">Your study sessions</p>
       </motion.header>
 
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="w-4 h-4 rounded-full border-2 border-white/10 border-t-teal-500 spin" />
+          <div className="flex items-center justify-center h-full gap-2.5">
+            {/* /delight: named loading state, not a nameless spinner */}
+            <div className="w-3.5 h-3.5 rounded-full border-2 border-[#222] border-t-[#22c55e] spin" />
+            <span className="text-[12px] text-white/30">Loading sessions…</span>
           </div>
         ) : error ? (
           <div className="flex items-center justify-center h-full px-6">
-            <p className="text-[13px] text-red-400/70 text-center">{error}</p>
+            {/* /copy: what happened + what to do */}
+            <p className="text-[13px] text-red-400/70 text-center">
+              {error}. Try closing and reopening the app.
+            </p>
           </div>
         ) : sessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2 px-8">
-            <p className="text-[14px] text-white/40 text-center">No sessions yet</p>
-            <p className="text-[12px] text-white/20 text-center leading-relaxed">
-              Complete your first study session to see your history here
+            {/* /copy: empty state teaches the interface */}
+            <p className="text-[14px] text-white/50 font-medium text-center">No sessions yet</p>
+            <p className="text-[12px] text-white/25 text-center leading-relaxed">
+              Each session you complete will appear here with your focus score, duration, and subject
             </p>
           </div>
         ) : (
-          <div className="px-4 py-4 flex flex-col gap-2">
+          /* /layout: flat rows with 1px dividers, not identical rounded cards */
+          <div className="divide-y divide-[#191919]">
             {sessions.map((s, i) => {
               const subject = subjectMap[s.subject_id]
               const pct = s.focus_score !== null ? Math.round(s.focus_score * 100) : null
               return (
                 <motion.div
                   key={s.id}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.22, delay: Math.min(i * 0.04, 0.2), ease: EASE }}
-                  className="bg-[#161616] border border-[#252525] rounded-2xl px-4 py-3.5 flex items-center gap-3"
+                  transition={{ duration: 0.2, delay: Math.min(i * 0.04, 0.2), ease: EASE }}
+                  className="flex items-center gap-3 px-6 py-3.5"
                 >
                   <div className="flex-1 min-w-0">
+                    {/* /colorize: subject color is the ONLY color accent per row */}
                     {subject && (
                       <span
                         className="text-[10px] uppercase tracking-[0.08em] font-semibold"
@@ -106,9 +121,11 @@ export default function HistoryScreen() {
                         {subject.name}
                       </span>
                     )}
-                    <p className="text-[14px] text-white/85 font-medium leading-snug truncate mt-0.5">
+                    {/* /typeset: 14px, medium weight, 85% opacity */}
+                    <p className="text-[14px] text-[#f0f0f0]/85 font-medium leading-snug truncate mt-0.5">
                       {s.topic}
                     </p>
+                    {/* /typeset: 11px, 30% opacity — secondary metadata */}
                     <div className="flex items-center gap-2 text-[11px] text-white/30 mt-1">
                       <span>{formatDate(s.started_at)}</span>
                       {s.total_minutes !== null && (
@@ -120,16 +137,18 @@ export default function HistoryScreen() {
                     </div>
                   </div>
 
+                  {/* Focus % — right-aligned, dominant number */}
                   <div className="shrink-0 flex flex-col items-end gap-0.5">
                     {pct !== null ? (
                       <>
-                        <span className={`text-[22px] font-bold leading-none tracking-[-0.03em] ${scoreColor(s.focus_score)}`}>
+                        {/* /typeset: 22px bold, colored — the number that matters */}
+                        <span className={`text-[22px] font-bold leading-none tracking-[-0.03em] tabular-nums ${scoreColorStyle(s.focus_score)}`}>
                           {pct}%
                         </span>
-                        <span className="text-[10px] text-white/25 uppercase tracking-[0.07em]">focus</span>
+                        <span className="text-[10px] text-white/20 uppercase tracking-[0.07em]">focus</span>
                       </>
                     ) : (
-                      <span className="text-[13px] text-white/20">—</span>
+                      <span className="text-[13px] text-white/15">—</span>
                     )}
                   </div>
                 </motion.div>
