@@ -245,10 +245,11 @@ These apply continuously throughout a session, not just at the start and end.
 - A checklist item in `next-steps.md` is completed → check it off immediately
 
 **At session start:**
-1. Read `docs/next-steps.md` — understand exactly where the build is
-2. Read the most recent `docs/build-log/session-00X.md` — know what was just done
-3. Read any `docs/architecture/` files relevant to today's work
-4. Check `docs/decisions/decision-log.md` for constraints that apply
+1. Read `skills.md` — brand, color system, typography, animation rules, anti-patterns, skill map. MANDATORY before any UI work.
+2. Read `docs/next-steps.md` — understand exactly where the build is
+4. Read the most recent `docs/build-log/session-00X.md` — know what was just done
+5. Read any `docs/architecture/` files relevant to today's work
+6. Check `docs/decisions/decision-log.md` for constraints that apply
 
 **At session end:**
 1. Make sure the current session build log is complete and accurate
@@ -261,3 +262,50 @@ These apply continuously throughout a session, not just at the start and end.
 - Never start a session without reading the most recent build log
 - If something in the docs contradicts the actual code, trust the code and update the docs
 - The build log for the current session is a living document — keep it open and update it as work happens, not after
+
+---
+
+## Design Skills — Non-Negotiable
+
+These skills live in `.agents/skills/`. They MUST be used for all UI/design work. Generic AI output is not acceptable.
+
+### Mandatory workflow for any UI work
+1. **Before touching any component**, read `skills.md` — it contains everything: brand context, color system, typography, animation rules, anti-patterns, and which skill to invoke
+2. Apply the relevant skill from the table in `skills.md` based on what's being built
+
+### Available skills and when to use them
+
+| Skill | When to use |
+|---|---|
+| `impeccable` | Any new screen, component, or design system work — the master design skill |
+| `emil-design-eng` | Micro-interactions, animations, component feel, "does this feel right" questions |
+| `polish` | Refining existing screens — spacing, hierarchy, details that are almost-but-not-quite right |
+| `layout` | Page structure, information architecture, visual hierarchy decisions |
+| `typeset` | Typography choices, type scale, font pairing |
+| `colorize` | Color palette, contrast, accent color decisions |
+| `animate` | Motion design, transition choreography, easing choices |
+| `shape` | Border radius, shadow, surface treatment decisions |
+| `critique` | Reviewing existing UI for problems before rebuilding |
+| `audit` | Full design audit of a screen or flow |
+| `redesign-existing-projects` | Complete screen redesigns |
+| `stitch-design-taste` | When output feels generic — force a taste reset |
+| `high-end-visual-design` | When pushing for a premium, distinctive aesthetic |
+| `distill` | Simplifying cluttered UI — when there's too much going on |
+| `quieter` | Reducing visual noise on a screen |
+| `bolder` | When something is too timid — needs more visual confidence |
+| `delight` | Adding moments of unexpected craft and joy |
+| `adapt` | Responsive/adaptive layout changes |
+| `clarify` | When a screen is confusing — improving clarity without redesigning |
+| `overdrive` | Maximum creative mode — when we want something truly unexpected |
+| `full-output-enforcement` | When full file rewrites are needed, no truncation |
+| `optimize` | Performance optimization for UI |
+| `minimalist-ui` | Extreme reduction — when everything must earn its place |
+| `industrial-brutalist-ui` | Raw, utilitarian aesthetic direction |
+| `design-taste-frontend` | General design taste improvement pass |
+
+### Design context file
+- Location: `.impeccable.md` in project root
+- Contains: target users, brand personality, aesthetic direction, design principles
+- This file is the single source of truth for design decisions
+- Read it at the start of every session that involves UI work
+- Update it whenever a significant design decision is made

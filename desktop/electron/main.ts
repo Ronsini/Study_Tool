@@ -91,9 +91,10 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 660,
     height: 720,
-    minWidth: 560,
-    minHeight: 600,
-    resizable: false,
+    minWidth: 460,
+    minHeight: 560,
+    resizable: true,
+    fullscreenable: true,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0a0a0a',
     webPreferences: {

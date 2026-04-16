@@ -61,6 +61,10 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
   const realPercent = totalMin > 0 ? Math.min(100, Math.round((realFocusMin / totalMin) * 100)) : 0
   const breakdown = summary.distraction_breakdown ?? []
 
+  // Show "< 1" for sub-minute sessions rather than a bare "0"
+  const totalMinDisplay = totalMin === 0 && summary.focus_score !== null ? '< 1' : totalMin
+  const realFocusMinDisplay = realFocusMin === 0 && totalMin === 0 && summary.focus_score !== null ? '< 1' : realFocusMin
+
   const scoreColor = focusPercent >= 70 ? 'text-teal-400'
     : focusPercent >= 40 ? 'text-amber-400'
     : 'text-red-400'
@@ -84,8 +88,8 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
 
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-2.5">
-          <StatCard value={totalMin} label="Total min" delay={0.05} />
-          <StatCard value={realFocusMin} label="Focus min" color="text-teal-400" delay={0.09} />
+          <StatCard value={totalMinDisplay} label="Total min" delay={0.05} />
+          <StatCard value={realFocusMinDisplay} label="Focus min" color="text-teal-400" delay={0.09} />
           <StatCard value={`${focusPercent}%`} label="Focus score" color={scoreColor} delay={0.13} />
         </div>
 
@@ -111,12 +115,11 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
         </motion.div>
 
         {/* Distraction breakdown */}
-        {(breakdown.length > 0 || !isPro) && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.26, delay: 0.2, ease: EASE }}
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.26, delay: 0.2, ease: EASE }}
+        >
             <p className="text-[10px] text-white/30 uppercase tracking-[0.1em] mb-2.5 font-semibold">
               Distraction breakdown
             </p>
@@ -198,7 +201,6 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
               )}
             </div>
           </motion.div>
-        )}
 
         {/* AI feedback */}
         {summary.ai_feedback && (

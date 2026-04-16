@@ -75,12 +75,16 @@ function AppContent() {
   // ── Active timer (no nav — user should not navigate away mid-session) ─────
   if (screen === 'timer' && sessionId) {
     return (
-      <TimerScreen
-        sessionId={sessionId}
-        topic={sessionTopic}
-        studyMode={sessionStudyMode}
-        onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
-      />
+      <div className="flex h-full justify-center bg-[#0f0f0f]">
+        <div className="w-full max-w-[720px]">
+          <TimerScreen
+            sessionId={sessionId}
+            topic={sessionTopic}
+            studyMode={sessionStudyMode}
+            onSessionEnded={(s) => { setSummary(s); setScreen('summary') }}
+          />
+        </div>
+      </div>
     )
   }
 
@@ -122,22 +126,25 @@ function AppContent() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={screen}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: EASE }}
-            className="h-full"
-          >
-            {content}
-          </motion.div>
-        </AnimatePresence>
+    <div className="flex h-full justify-center bg-[#080808]">
+      {/* Centered column — content + nav stay inside max-720px at any window size */}
+      <div className="w-full max-w-[720px] flex flex-col">
+        <div className="flex-1 overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={screen}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: EASE }}
+              className="h-full"
+            >
+              {content}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        <BottomNav active={navTab} onChange={handleNavChange} />
       </div>
-      <BottomNav active={navTab} onChange={handleNavChange} />
     </div>
   )
 }
