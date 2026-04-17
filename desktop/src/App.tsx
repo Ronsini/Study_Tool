@@ -128,22 +128,20 @@ function AppContent() {
       {/* Left sidebar — desktop nav */}
       <SideNav active={navTab} onChange={handleNavChange} />
 
-      {/* Content area — max-width prevents excessive stretch on wide windows */}
-      <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
-        <div className="w-full max-w-[720px] h-full flex flex-col overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={screen}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: EASE }}
-              className="h-full"
-            >
-              {content}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+      {/* Content area — fills all remaining space at any window size */}
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={screen}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2, ease: EASE }}
+            className="h-full"
+          >
+            {content}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   )
