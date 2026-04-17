@@ -130,7 +130,7 @@ function AppContent() {
 
       {/* Content area — max-width prevents excessive stretch on wide windows */}
       <div className="flex-1 min-w-0 overflow-hidden flex justify-center">
-        <div className="w-full max-w-[820px] h-full flex flex-col overflow-hidden">
+        <div className="w-full max-w-[720px] h-full flex flex-col overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={screen}

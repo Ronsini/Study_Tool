@@ -37,7 +37,7 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 const TRAY_COLORS = {
-  focused:    '#2dd4bf',
+  focused:    '#22c55e',
   distracted: '#fbbf24',
   idle:       '#6b7280',
 } as const
@@ -89,12 +89,13 @@ function getAppInfo(): { app: string; browser_url: string | null } {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 660,
-    height: 720,
-    minWidth: 460,
-    minHeight: 560,
+    width: 720,
+    height: 780,
+    minWidth: 600,
+    maxWidth: 820,
+    minHeight: 600,
     resizable: true,
-    fullscreenable: true,
+    fullscreenable: false,
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0a0a0a',
     webPreferences: {
