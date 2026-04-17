@@ -121,7 +121,7 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
 
       {/* Scrollable body */}
       <div className="flex-1 overflow-y-auto">
-        <form id="session-form" onSubmit={handleStart} className="px-6 py-5 flex flex-col gap-6">
+        <form id="session-form" onSubmit={handleStart} className="px-6 py-5 flex flex-col gap-8 max-w-[660px]">
 
           {/* Subject */}
           <motion.section
@@ -355,6 +355,7 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
         transition={{ duration: 0.24, delay: 0.2, ease: EASE }}
         className="shrink-0 px-6 py-4 border-t border-[#1a1a1a] bg-[#0f0f0f]"
       >
+        <div className="max-w-[660px]">
         <motion.button
           type="submit"
           form="session-form"
@@ -366,6 +367,7 @@ export default function StartSessionScreen({ onSessionStarted }: Props) {
         >
           {loading ? 'Starting…' : 'Begin session'}
         </motion.button>
+        </div>
       </motion.footer>
 
     </div>
