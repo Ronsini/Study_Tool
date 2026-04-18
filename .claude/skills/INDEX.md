@@ -1,0 +1,52 @@
+# Skills Index
+
+This folder is the home for all project-wide Claude Code skills.
+Skills specific to one layer live in that layer's `.claude/skills/` folder.
+
+---
+
+## Installed Skills
+
+### Project-Wide (this folder)
+| Skill | Purpose | Status |
+|-------|---------|--------|
+| ui-ux-pro-max | Design system — 67 styles, 161 color palettes, 57 typography pairings, 99 UX rules | Active |
+| motion | Animation patterns for React/Electron using Motion v12 (Framer Motion) | Active |
+| 21st-dev-magic | AI component generation via MCP server — production-ready React + Tailwind components | Active |
+| emil-design-eng | Emil Kowalski's design engineering philosophy — easing, timing, micro-interactions, performance | Active (symlinked from .agents/skills/) |
+| impeccable (×17) | Full design skill suite by pbakaus: adapt, animate, audit, bolder, clarify, colorize, critique, delight, distill, impeccable, layout, optimize, overdrive, polish, quieter, shape, typeset | Active (symlinked from .agents/skills/) |
+| taste-skill (×7) | Design taste suite by Leonxlnx: high-end-visual-design, minimalist-ui, industrial-brutalist-ui, stitch-design-taste, design-taste-frontend, redesign-existing-projects, full-output-enforcement | Active (symlinked from .agents/skills/) |
+
+### MCP Servers (global `~/.claude.json`)
+| Server | Purpose | Status |
+|--------|---------|--------|
+| magic (21st.dev) | AI component generation | Connected |
+| Google Drive | File access | Needs auth |
+| Google Calendar | Calendar access | Needs auth |
+| Gmail | Email access | Needs auth |
+
+### npm Packages
+| Package | Purpose |
+|---------|---------|
+| motion v12 | Animations for desktop React app |
+
+---
+
+## How to Add a New Skill
+
+**Project-wide skill:**
+```bash
+cd /Users/ronnie/Desktop/Study_Tool/Study_Tool
+uipro init --ai claude   # or whatever the skill's installer is
+```
+
+**Layer-specific skill:**
+```bash
+cd /Users/ronnie/Desktop/Study_Tool/Study_Tool/desktop   # or backend/, dashboard/, etc.
+# run installer from that directory
+```
+
+**MCP server:**
+```bash
+claude mcp add <name> --scope user -- npx -y <package>
+```

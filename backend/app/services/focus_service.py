@@ -12,18 +12,50 @@ DISTRACTION_TYPES = {
 
 FOCUSED_APPS = {
     "notion", "obsidian", "word", "pages", "docs",
-    "excel", "numbers", "sheets", "code", "xcode",
-    "pycharm", "intellij", "vim", "neovim", "emacs",
-    "terminal", "iterm", "warp", "zotero", "anki",
-    "acrobat", "preview", "kindle",
+    "excel", "numbers", "sheets", "code", "xcode", "cursor",
+    "pycharm", "intellij", "vim", "neovim", "emacs", "sublime",
+    "terminal", "iterm", "warp", "ghostty", "zotero", "anki",
+    "acrobat", "preview", "kindle", "goodnotes", "notability",
+    "zoom", "teams", "meet",  # lecture mode apps
 }
 
 DISTRACTION_APPS = {
     "instagram", "tiktok", "snapchat", "twitter", "x",
     "facebook", "reddit", "youtube", "netflix", "hulu",
     "discord", "messages", "whatsapp", "telegram",
-    "twitch", "imessage",
+    "twitch", "imessage", "threads", "bereal",
+    "9gag", "tumblr", "pinterest",
 }
+
+# Video/entertainment patterns — used to classify video_site vs social_media
+VIDEO_PATTERNS = {"youtube", "youtu.be", "netflix", "twitch", "hulu", "primevideo", "disneyplus"}
+
+# Browser URL distraction domains — catches YouTube/Reddit in Chrome/Safari/etc.
+DISTRACTION_DOMAINS = {
+    "youtube.com", "youtu.be",
+    "instagram.com", "tiktok.com",
+    "twitter.com", "x.com",
+    "facebook.com",
+    "reddit.com",
+    "netflix.com", "hulu.com",
+    "twitch.tv",
+    "9gag.com",
+    "snapchat.com",
+    "discord.com",
+    "threads.net",
+    "pinterest.com",
+    "primevideo.com", "disneyplus.com",
+}
+
+# Physical study modes where Mac keyboard/mouse idle is normal (user is reading/writing on paper)
+PHYSICAL_MODES = {"physical_book", "physical_writing"}
+
+# Idle threshold: 5 minutes default; physical modes don't count Mac idle at all
+IDLE_THRESHOLD_SECONDS = 300
+
+
+def _is_video_distraction(text: str) -> bool:
+    return any(v in text for v in VIDEO_PATTERNS)
 
 
 def compute_focus_score(signals: dict) -> tuple[float, bool, str | None]:
@@ -39,9 +71,12 @@ def compute_focus_score(signals: dict) -> tuple[float, bool, str | None]:
     looking_at_screen: bool = signals.get("looking_at_screen", True)
     phone_detected: bool = signals.get("phone_detected", False)
     active_app: str = signals.get("active_app", "").lower()
+    browser_url: str = (signals.get("browser_url") or "").lower()
     window_switches: int = signals.get("window_switches", 0)
     idle_seconds: int = signals.get("idle_seconds", 0)
+    study_mode: str = signals.get("study_mode", "mac_pc")
 
+    # ── Webcam signals (placeholder until MediaPipe integrated) ──────────────
     if not face_present:
         score -= 0.6
         distraction_type = "face_absent"
@@ -53,16 +88,29 @@ def compute_focus_score(signals: dict) -> tuple[float, bool, str | None]:
     if not looking_at_screen:
         score -= 0.3
 
-    if any(app in active_app for app in DISTRACTION_APPS):
+    # ── App-level distraction detection ──────────────────────────────────────
+    app_distracted = any(d in active_app for d in DISTRACTION_APPS)
+    if app_distracted:
         score -= 0.7
-        distraction_type = "social_media" if active_app not in {"youtube", "netflix", "twitch", "hulu"} else "video_site"
+        distraction_type = "video_site" if _is_video_distraction(active_app) else "social_media"
 
+    # ── Browser URL distraction detection (Chrome / Safari / Arc / Firefox) ──
+    # Only fires if the app check didn't already catch it, so we don't double-penalise
+    elif browser_url:
+        url_distracted = any(domain in browser_url for domain in DISTRACTION_DOMAINS)
+        if url_distracted:
+            score -= 0.7
+            distraction_type = "video_site" if _is_video_distraction(browser_url) else "social_media"
+
+    # ── Rapid window switching ────────────────────────────────────────────────
     if window_switches > 5:
         score -= min(0.3, (window_switches - 5) * 0.05)
         if not distraction_type:
             distraction_type = "rapid_switching"
 
-    if idle_seconds > 300:
+    # ── Idle detection (skipped for physical study modes) ────────────────────
+    # In physical_book / physical_writing mode the student isn't typing — that's normal.
+    if study_mode not in PHYSICAL_MODES and idle_seconds > IDLE_THRESHOLD_SECONDS:
         score -= 0.4
         if not distraction_type:
             distraction_type = "idle"

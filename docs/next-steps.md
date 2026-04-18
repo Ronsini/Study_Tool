@@ -29,22 +29,37 @@
 ## Phase 2 — Desktop App (current)
 Branch: `feature/desktop-app`
 
-- [ ] Scaffold — Electron + Vite + React + TypeScript in `desktop/`
-- [ ] Auth screens — login, register, JWT stored via electron-store
-- [ ] Session start form — subject picker, topic, study mode, goal minutes
-- [ ] Timer screen — live clock, focus status indicator, stop button
-- [ ] Focus signal loop — POST /activity every 30s, handle fire_checkin response
-- [ ] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
-- [ ] Session summary screen — total time, real focus time, score, missed questions
-- [ ] Menu bar tray indicator — green/yellow/red dot based on focus status
+- [x] Scaffold — Electron + Vite + React + TypeScript in `desktop/`
+- [x] Auth screens — login, register, JWT stored via electron-store
+- [x] Session start form — subject picker, topic, study mode, goal minutes
+- [x] Timer screen — live clock, focus status indicator, stop button
+- [x] Focus signal loop — POST /activity every 30s, handle fire_checkin response
+- [x] Check-in overlay — non-blocking popup when fire_checkin is true, one question at a time
+- [x] Session summary screen — total time, real focus time, score, missed questions
+- [x] Full UI redesign — teal/orange design system, Motion animations, Emil Kowalski micro-interactions, spring check-in overlay, ripple focus rings
+- [x] Layout fixes — sticky-footer pattern, window 660×720, contrast fixes on all surfaces
+- [x] Run and test full app live in Electron window — core loop proven end-to-end (session 006)
+- [x] Menu bar tray indicator — teal/amber/gray dot via IPC, updates on every /activity response (session 006)
+- [x] Window/app tracking — AppleScript via child_process, real active_app + window switch count (session 006)
+- [x] Distraction breakdown in summary — grouped by type+source, Pro paywall with blur+lock overlay (session 006/007)
+- [x] Bottom tab navigation — Home, History, Profile tabs; timer is nav-free; session 007
+- [x] History screen — lists past sessions with subject color, date, score (session 007)
+- [x] Profile screen — user card, subscription badge, upgrade CTA, sign out (session 007)
+- [x] skills.md baked in — all 23 skill principles in one file, loaded at session start (session 008)
+- [x] **REDESIGN ALL SCREENS** — applied all skills from skills.md (session 009)
+  - [x] Fix teal → green everywhere (teal is not in the color system)
+  - [x] Kill 3-stat-card identical grid in SummaryScreen → asymmetric hero layout
+  - [x] Kill emoji icons in StartSessionScreen study mode picker → clean flat list
+  - [x] Apply 4-step opacity hierarchy across all screens
+  - [x] whileHover 1.015 / whileTap 0.975 on every pressable surface
 - [ ] Webcam presence detection — MediaPipe, runs locally, never sends video
-- [ ] Window/app tracking — Node.js child_process, detect active app name
+- [ ] Design polish pass — spacing rhythm, micro-details
 - [ ] Build for Mac (.dmg via electron-builder)
 
 ---
 
 ## Phase 3 — Web Dashboard
-- [ ] Next.js setup + Vercel deploy
+[ ] Next.js setup + Vercel deploy
 - [ ] Daily + weekly dashboard
 - [ ] Subject performance charts
 - [ ] Shareable focus cards
