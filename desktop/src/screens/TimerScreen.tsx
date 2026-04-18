@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { Info } from 'lucide-react'
 import { api } from '../lib/api'
 import CheckInOverlay from './CheckInOverlay'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // /colorize: teal → green (#22c55e). Green = focused/real. Amber = distracted.
 // /animate: ripple rings use green at 0.25/0.15 opacity — very subtle
@@ -155,6 +157,7 @@ export default function TimerScreen({ sessionId, topic, studyMode, onSessionEnde
   const statusText = !isWarm ? 'text-white/30' : isFocused ? 'text-[#22c55e]' : 'text-[#fbbf24]'
 
   return (
+    <TooltipProvider>
     <div className="flex flex-col items-center justify-between h-full bg-[#0f0f0f] relative">
 
       <AnimatePresence>
@@ -214,6 +217,16 @@ export default function TimerScreen({ sessionId, topic, studyMode, onSessionEnde
               {Math.round(focusScore! * 100)}%
             </span>
           )}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="text-white/15 hover:text-white/40 transition-colors duration-150 cursor-default ml-0.5">
+                <Info size={11} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[220px] leading-snug">
+              Updated every 30s. Based on active window, idle time, and browser activity.
+            </TooltipContent>
+          </Tooltip>
         </div>
       </motion.div>
 
@@ -238,5 +251,6 @@ export default function TimerScreen({ sessionId, topic, studyMode, onSessionEnde
       </motion.div>
 
     </div>
+    </TooltipProvider>
   )
 }

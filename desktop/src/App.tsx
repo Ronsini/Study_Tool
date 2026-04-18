@@ -8,10 +8,11 @@ import TimerScreen from './screens/TimerScreen'
 import SummaryScreen from './screens/SummaryScreen'
 import HistoryScreen from './screens/HistoryScreen'
 import ProfileScreen from './screens/ProfileScreen'
-import SideNav from './components/SideNav'
-import type { NavTab } from './components/SideNav'
+import SettingsScreen from './screens/SettingsScreen'
+import AppSidebar from './components/AppSidebar'
+import type { NavTab } from './components/AppSidebar'
 
-type Screen = 'login' | 'register' | 'start' | 'timer' | 'summary' | 'history' | 'profile'
+type Screen = 'login' | 'register' | 'start' | 'timer' | 'summary' | 'history' | 'profile' | 'settings'
 
 interface DistractionEvent {
   type: string
@@ -88,13 +89,16 @@ function AppContent() {
 
   // ── Main app — sidebar + content ──────────────────────────────────────────
   const navTab: NavTab =
-    screen === 'history' ? 'history' :
-    screen === 'profile' ? 'profile' :
+    screen === 'history'  ? 'history'     :
+    screen === 'profile'  ? 'profile'     :
+    screen === 'settings' ? 'settings'    :
+    screen === 'summary'  ? 'home'        :
+    screen === 'start'    ? 'new-session' :
     'home'
 
   function handleNavChange(tab: NavTab) {
-    if (tab === 'home') setScreen('start')
-    else setScreen(tab)
+    if (tab === 'home' || tab === 'new-session') setScreen('start')
+    else setScreen(tab as Screen)
   }
 
   let content: React.ReactNode
@@ -110,6 +114,8 @@ function AppContent() {
     content = <HistoryScreen />
   } else if (screen === 'profile') {
     content = <ProfileScreen />
+  } else if (screen === 'settings') {
+    content = <SettingsScreen />
   } else {
     content = (
       <StartSessionScreen
@@ -125,10 +131,10 @@ function AppContent() {
 
   return (
     <div className="flex h-full bg-[#0a0a0a]">
-      {/* Left sidebar — desktop nav */}
-      <SideNav active={navTab} onChange={handleNavChange} />
+      {/* Left sidebar */}
+      <AppSidebar active={navTab} onChange={handleNavChange} />
 
-      {/* Content area — fills all remaining space at any window size */}
+      {/* Content area */}
       <div className="flex-1 min-w-0 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div

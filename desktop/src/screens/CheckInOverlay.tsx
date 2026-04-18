@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
+import { X } from 'lucide-react'
 import { api } from '../lib/api'
 
 // /colorize: teal → green (#22c55e). Label = green/60, focus ring = green, correct feedback = green.
@@ -43,7 +44,7 @@ export default function CheckInOverlay({ checkinId, question, onDismiss }: Props
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.18 }}
-      className="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6"
+      className="absolute inset-0 bg-[#0a0a0a]/70 backdrop-blur-md flex items-center justify-center z-50 p-6"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.93, y: 12 }}
@@ -65,10 +66,10 @@ export default function CheckInOverlay({ checkinId, question, onDismiss }: Props
           </div>
           <button
             onClick={onDismiss}
-            className="text-white/20 hover:text-white/50 transition-colors duration-150 shrink-0 mt-0.5 text-lg leading-none"
+            className="text-white/20 hover:text-white/50 transition-colors duration-150 shrink-0 mt-0.5 cursor-pointer"
             aria-label="Dismiss"
           >
-            ✕
+            <X size={15} />
           </button>
         </div>
 
@@ -80,7 +81,7 @@ export default function CheckInOverlay({ checkinId, question, onDismiss }: Props
               onChange={e => setAnswer(e.target.value)}
               placeholder="Write your answer…"
               rows={3}
-              className="bg-[#1c1c1c] border border-[#303030] hover:border-[#3e3e3e] focus:border-[#22c55e] rounded-xl px-4 py-3 text-[14px] text-white placeholder-white/30 resize-none transition-colors duration-150 leading-relaxed outline-none"
+              className="bg-[#1c1c1c] border border-[#505050] hover:border-[#626262] focus:border-white/40 rounded-xl px-4 py-3 text-[14px] text-white placeholder-white/30 resize-none transition-colors duration-150 leading-relaxed outline-none"
             />
             <div className="flex gap-2">
               <motion.button

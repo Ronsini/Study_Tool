@@ -1,5 +1,7 @@
 import { motion } from 'motion/react'
+import { Info } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 // /layout — BANNED PATTERN REMOVED:
 //   Was: grid grid-cols-3 with 3 identical StatCard components (icon + number + label repeated)
@@ -52,6 +54,7 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
     : '#f87171'
 
   return (
+    <TooltipProvider>
     <div className="flex flex-col h-full bg-[#0f0f0f]">
 
       {/* Header */}
@@ -61,8 +64,8 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
         transition={{ duration: 0.24, ease: EASE }}
         className="shrink-0 px-6 pt-6 pb-4 border-b border-[#1a1a1a]"
       >
-        <p className="text-[10px] text-white/25 uppercase tracking-[0.12em] mb-1">{topic}</p>
-        <h1 className="text-[26px] font-bold text-[#f0f0f0] tracking-[-0.03em]">Session complete</h1>
+        <p className="text-[11px] text-white/25 uppercase tracking-[0.12em] mb-3 font-medium">{topic}</p>
+        <h1 className="text-[42px] font-bold text-[#f0f0f0] tracking-[-0.04em] leading-[1.05]">Session complete</h1>
       </motion.header>
 
       {/* Content */}
@@ -82,7 +85,19 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
             <div className="text-[52px] font-bold leading-none tracking-[-0.04em] tabular-nums" style={{ color: scoreColor }}>
               {focusPercent}%
             </div>
-            <p className="text-[11px] text-white/30 uppercase tracking-[0.09em] mt-2">Focus score</p>
+            <div className="flex items-center gap-1.5 mt-2">
+              <p className="text-[11px] text-white/30 uppercase tracking-[0.09em]">Focus score</p>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button className="text-white/20 hover:text-white/45 transition-colors duration-150 cursor-default">
+                    <Info size={11} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="max-w-[200px] leading-snug">
+                  Weighted average of active window, idle time, and browser activity. Updated every 30s.
+                </TooltipContent>
+              </Tooltip>
+            </div>
           </div>
 
           {/* Divider */}
@@ -139,23 +154,15 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
             Distraction breakdown
           </p>
 
-          <div className="relative rounded-2xl overflow-hidden">
-            {(() => {
-              const PLACEHOLDER = [
-                { type: 'social_media', label: 'Social media', source: 'instagram.com', windows: 4, minutes: 2 },
-                { type: 'video_site',   label: 'Video site',   source: 'youtube.com',   windows: 6, minutes: 3 },
-                { type: 'idle',         label: 'Idle',         source: null,             windows: 2, minutes: 1 },
-              ]
-              const rows = isPro ? breakdown : (breakdown.length > 0 ? breakdown : PLACEHOLDER)
-              const rowsTotal = rows.reduce((s, e) => s + e.minutes, 0)
-
+          {isPro ? (
+            /* Pro: real data */
+            (() => {
+              const rowsTotal = breakdown.reduce((s, e) => s + e.minutes, 0)
               return (
-                <div className={`bg-[#161616] border border-[#252525] rounded-2xl p-4 flex flex-col gap-3.5 ${
-                  !isPro ? 'blur-[7px] opacity-30 saturate-0 select-none pointer-events-none' : ''
-                }`}>
-                  {rows.length === 0 ? (
+                <div className="bg-[#161616] border border-[#252525] rounded-2xl p-4 flex flex-col gap-3.5">
+                  {breakdown.length === 0 ? (
                     <p className="text-[13px] text-white/50 text-center py-1">No distractions detected</p>
-                  ) : rows.map((event, i) => {
+                  ) : breakdown.map((event, i) => {
                     const barPct = rowsTotal > 0 ? Math.round((event.minutes / rowsTotal) * 100) : 100
                     return (
                       <div key={i} className="flex flex-col gap-1.5">
@@ -186,31 +193,31 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
                   })}
                 </div>
               )
-            })()}
-
-            {/* Paywall overlay — free users */}
-            {!isPro && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl bg-[#0a0a0a]/88">
-                <div className="w-10 h-10 rounded-2xl bg-[#1e1e1e] border border-[#333] flex items-center justify-center">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-white/50">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                    <path d="M7 11V7a5 5 0 0110 0v4"/>
-                  </svg>
+            })()
+          ) : (
+            /* Free: ghost rows — invite, don't punish */
+            <div className="bg-[#161616] border border-[#252525] rounded-2xl p-4 flex flex-col gap-3.5">
+              {[65, 42, 28].map((w, i) => (
+                <div key={i} className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="h-2.5 rounded-full bg-white/[0.06]" style={{ width: `${w}%` }} />
+                    <div className="h-2.5 w-6 rounded-full bg-white/[0.06] ml-3 shrink-0" />
+                  </div>
+                  <div className="h-px bg-[#252525] rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-white/[0.05]" style={{ width: `${w}%` }} />
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-[14px] font-semibold text-[#f0f0f0]">Pro feature</p>
-                  <p className="text-[12px] text-white/40 mt-1 px-8 leading-relaxed">
-                    See exactly what distracted you and for how long
-                  </p>
-                </div>
-                <div className="px-4 py-1.5 bg-[#f97316]/15 border border-[#f97316]/35 rounded-full">
-                  <span className="text-[11px] font-semibold text-[#f97316] uppercase tracking-[0.08em]">
-                    Upgrade to unlock
-                  </span>
-                </div>
+              ))}
+              <div className="flex items-center justify-between pt-1">
+                <p className="text-[12px] text-white/35 leading-snug">
+                  See what distracted you — and for how long
+                </p>
+                <button className="text-[11px] font-semibold text-[#f97316] hover:text-[#fb923c] transition-colors duration-150 shrink-0 ml-4 cursor-pointer">
+                  Upgrade ↗
+                </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </motion.div>
 
         {/* AI feedback */}
@@ -221,8 +228,7 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
             transition={{ duration: 0.24, delay: 0.22, ease: EASE }}
             className="bg-[#161616] border border-[#252525] rounded-2xl p-4"
           >
-            {/* /colorize: green label — AI summary is about real focus, earned */}
-            <p className="text-[10px] text-[#22c55e]/60 uppercase tracking-[0.1em] mb-2.5 font-semibold">
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.1em] mb-2.5 font-semibold">
               Session summary
             </p>
             <p className="text-[13px] text-white/65 leading-relaxed">{summary.ai_feedback}</p>
@@ -250,5 +256,6 @@ export default function SummaryScreen({ summary, topic, onStartNew }: Props) {
       </motion.footer>
 
     </div>
+    </TooltipProvider>
   )
 }
